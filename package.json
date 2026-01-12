@@ -1,8 +1,9 @@
 {
-  "name": "node-blue-boilerplate",
+  "name": "password-generator",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dist": "tsup src",
     "start:dev": "tsx --env-file=.env src/server.ts",
@@ -13,9 +14,16 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^20.11.30",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^20.19.27",
+    "@types/prompts": "^2.4.9",
     "tsup": "^8.0.2",
-    "tsx": "^4.7.1",
+    "tsx": "^4.21.0",
     "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.2.1"
   }
 }

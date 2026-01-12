@@ -1,1 +1,17 @@
+# Dependências
 node_modules/
+
+# Compilação
+dist/
+out/
+docs/
+
+# Banco de Dados Local 
+data/*.json
+
+# Variáveis de ambiente
+.env
+
+# Logs e Cache
+npm-debug.log*
+.eslintcache
