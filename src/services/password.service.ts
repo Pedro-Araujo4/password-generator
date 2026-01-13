@@ -1,8 +1,8 @@
 import crypto from 'crypto';
-import { IPasswordOptions, IPasswordRecord } from '../models/password.model.js';
+import { IPasswordOptions, IPasswordRecord } from '../models/password-model.js';
 import { generatePassword } from '../utils/password-generator.js';
 import { PasswordRepository } from '../repositories/password.repository.js';
-import { formatDateReadable } from '../utils/date.helper.js';
+import { formatDateReadable } from '../utils/date-helper.js';
 import { logger } from './logger.service.js';
 
 // Instanciamos o repositório para uso do service

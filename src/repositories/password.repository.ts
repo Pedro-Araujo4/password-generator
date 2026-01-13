@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { IPasswordRecord } from '../models/password.model.js';
+import { IPasswordRecord } from '../models/password-model.js';
 
 // __dirname não existe por padrão. Ela só existe no sistema antigo (CommonJS), então emulamos o __dirname usando o módulo url
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

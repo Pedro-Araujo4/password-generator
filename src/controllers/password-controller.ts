@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { PasswordService } from '../services/password.service.js';
-import { IPasswordResponse, IErrorResponse } from '../models/password.model.js';
+import { IPasswordResponse, IErrorResponse } from '../models/password-model.js';
 import { HttpStatus } from '../models/http-status.js';
-import { parsePasswordQuery } from '../utils/request.helper.js';
+import { parsePasswordQuery } from '../utils/request-helper.js';
 
 const passwordService = new PasswordService();
 

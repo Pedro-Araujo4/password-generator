@@ -4,6 +4,7 @@ node_modules/
 # Compilação
 dist/
 out/
+build/
 
 # Docs 
 docs/
@@ -12,8 +13,10 @@ docs/
 data/*.json
 
 # Logs (Registros de acesso podem conter dados sensíveis)
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 logs/
-*.log
 
 # Variáveis de ambiente
 .env
