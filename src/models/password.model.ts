@@ -1,4 +1,4 @@
-// Define o que o nosso Service precisa receber
+// Define o que o Service precisa receber
 export interface IPasswordOptions {
   length: number;
   hasSymbols: boolean;

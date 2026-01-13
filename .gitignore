@@ -4,10 +4,16 @@ node_modules/
 # Compilação
 dist/
 out/
+
+# Docs 
 docs/
 
 # Banco de Dados Local 
 data/*.json
+
+# Logs (Registros de acesso podem conter dados sensíveis)
+logs/
+*.log
 
 # Variáveis de ambiente
 .env
@@ -15,3 +21,7 @@ data/*.json
 # Logs e Cache
 npm-debug.log*
 .eslintcache
+
+# Arquivos do Sistema e Editores
+.DS_Store
+.vscode/

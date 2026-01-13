@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { validatePasswordLength } from '../models/password.model';
-import { HttpStatus } from '../models/http-status';
+import { validatePasswordLength } from '../models/password.model.js';
+import { HttpStatus } from '../models/http-status.js';
 
 export const validatePasswordRequest = (req: Request, res: Response, next: NextFunction) => {
   const { length } = req.query;

@@ -9,7 +9,6 @@ const filePath = path.resolve(__dirname, '../../data/passwords.json');
 
 
 export class PasswordRepository {
-
   
   public async getAll(): Promise<IPasswordRecord[]> {
     try {
