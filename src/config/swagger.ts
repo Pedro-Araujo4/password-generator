@@ -9,14 +9,59 @@ const options: swaggerJSDoc.Options = {
       description: 'API profissional para geração e gerenciamento de senhas seguras',
     },
     paths: {
-      '/api/generate': {
-        get: {
-          summary: 'Gera uma nova senha segura',
-          tags: ['Password'],
-          responses: {
-            200: { description: 'Sucesso' }
+  '/api/generate': {
+    post: {
+      summary: 'Gera uma nova senha segura',
+      tags: ['Password'],
+      parameters: [
+        {
+          name: 'length',
+          in: 'query',
+          description: 'Comprimento da senha',
+          required: false,
+          schema: {
+            type: 'integer',
+            default: 12,
+            minimum: 4
+          }
+        },
+        {
+          name: 'hasSymbols',
+          in: 'query',
+          description: 'Incluir símbolos na senha?',
+          required: false,
+          schema: {
+            type: 'boolean',
+            default: true
+          }
+        },
+        {
+          name: 'noDuplication',
+          in: 'query',
+          description: 'Evitar caracteres duplicados?',
+          required: false,
+          schema: {
+            type: 'boolean',
+            default: false
           }
         }
+      ],
+      responses: {
+        200: {
+          description: 'Sucesso',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  password: { type: 'string' }
+                 }
+               }
+              }
+            }
+          }
+        }
+       }
       },
       '/api/passwords': {
         get: {
