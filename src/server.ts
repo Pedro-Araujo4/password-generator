@@ -1,9 +1,13 @@
-import 'dotenv/config';
-import { app } from './app.js';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger.js';
+import path from 'node:path';
 
-const PORT = 3000;
+process.env.DATABASE_URL = `file:${path.resolve(process.cwd(), 'prisma/dev.db')}`;
+
+import 'dotenv/config';
+import { app } from './app.js';
+
+const PORT = process.env.PORT || 3000;
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

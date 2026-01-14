@@ -1,51 +1,83 @@
-import crypto from 'crypto';
+import "dotenv/config";
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaClient } from "../../generated/prisma/client.js";
 import { IPasswordOptions, IPasswordRecord } from '../models/password-model.js';
 import { generatePassword } from '../utils/password-generator.js';
-import { PasswordRepository } from '../repositories/password.repository.js';
 import { formatDateReadable } from '../utils/date-helper.js';
 import { logger } from './logger.service.js';
 
-// Instanciamos o repositório para uso do service
-const repository = new PasswordRepository();
+const connectionString = `${process.env.DATABASE_URL}`;
+
+const adapter = new PrismaBetterSqlite3({ url: connectionString });
+const prisma = new PrismaClient({ adapter });
+
+export { prisma };
 
 export class PasswordService {
-  
-  //Gera a senha, cria um registro com ID único e salva no "banco" JSON.
-  public async execute(options: IPasswordOptions): Promise<IPasswordRecord> { 
-    //  Gera a string da senha usando sua lógica utilitária
+ public async execute(options: IPasswordOptions): Promise<any> { 
+  try {
+    // 1. Gera a senha puramente em memória
     const password = generatePassword(options.length, options.hasSymbols, options.noDuplicates);
-    
-    const now = new Date();
 
-    // Monta o objeto completo (Record) que será salvo e retornado
-    const newRecord: IPasswordRecord = {
-      id: crypto.randomUUID(), // Gera um ID único como '550e8400-e29b-41d4-a716-446655440000'
-      password,
-      length: password.length,
-      createdAt: now.toISOString(),
-      formattedDate: formatDateReadable(now)
+    // 2. Tenta salvar (O erro acontece aqui se a URL estiver undefined)
+    const saved = await prisma.password.create({
+      data: {
+        content: password,
+        length: options.length,
+        hasSymbols: options.hasSymbols,
+      }
+    });
+       await logger.log('GENERATE_PASSWORD', `Size: ${saved.length}, ID: ${saved.id}`);
+    // 3. Retorno simplificado para teste (Sem helpers ou mappers complexos)
+    return {
+      id: saved.id,
+      content: saved.content,
+      status: "Sucesso no Banco!"
     };
+  } catch (error: any) {
+    console.error("ERRO DENTRO DO SERVICE:", error);
+    throw new Error(`Falha no Prisma: ${error.message}`);
+  }
+}
 
-    // Salva no arquivo JSON através do repositório
-    await repository.save(newRecord);
+  public async findById(id: string): Promise<IPasswordRecord | null> {
+    const saved = await prisma.password.findUnique({
+      where: { id }
+    });
 
-    await logger.log('GENERATE_PASSWORD', `Size: ${newRecord.length}, ID: ${newRecord.id}`);
+    if (!saved) return null;
 
-    return newRecord;
-  };
+    return {
+      id: saved.id,
+      password: saved.content,
+      length: saved.length,
+      createdAt: saved.createdAt.toISOString(),
+      formattedDate: formatDateReadable(saved.createdAt)
+    };
+  }
 
-  public async findById(id: string) {
-    return await repository.findById(id);
-  };
+  public async listAll(): Promise<IPasswordRecord[]> {
+    const passwords = await prisma.password.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
 
-  public async listAll() {
-    return await repository.getAll();
-  };
+    return passwords.map(p => ({
+      id: p.id,
+      password: p.content,
+      length: p.length,
+      createdAt: p.createdAt.toISOString(),
+      formattedDate: formatDateReadable(p.createdAt)
+    }));
+  }
 
-  public async remove(id?: string) {
-    await repository.delete(id);
+  public async remove(id?: string): Promise<void> {
+    if (id) {
+      await prisma.password.delete({ where: { id } });
+    } else {
+      await prisma.password.deleteMany();
+    }
+
     const detail = id ? `ID: ${id}` : 'ALL PASSWORDS';
     await logger.log('DELETE_PASSWORD', detail);
-  };
-};
-
+  }
+}

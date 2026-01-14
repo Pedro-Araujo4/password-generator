@@ -6,7 +6,7 @@ import { adminAuth } from '../middlewares/auth.middleware.js';
 const routes = Router();
 const passwordController = new PasswordController();
  
-routes.get('/generate', validatePasswordRequest, passwordController.handle);
+routes.post('/generate', validatePasswordRequest, passwordController.handle);
 
 
 routes.get('/passwords', passwordController.getAll);           // Listar todas
