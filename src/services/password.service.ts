@@ -25,6 +25,7 @@ export class PasswordService {
         content: password,
         length: options.length,
         hasSymbols: options.hasSymbols,
+        noDuplicates: options.noDuplicates,
       }
     });
        await logger.log('GENERATE_PASSWORD', `Size: ${saved.length}, ID: ${saved.id}`);

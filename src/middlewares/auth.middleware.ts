@@ -1,23 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
-import { HttpStatus } from '../models/http-status.js';
+import jwt from 'jsonwebtoken';
 
-export const adminAuth = (req: Request, res: Response, next: NextFunction) => {
-  const userKey = req.headers['x-admin-key'];
-  const ADMIN_KEY = process.env.ADMIN_KEY;
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1]; // Formato "Bearer TOKEN"
 
-  if (!ADMIN_KEY) {
-    return res.status(500).json({ 
-      error: "Erro de configuração: Chave mestra não definida no servidor." 
-    });
+  if (!token) {
+    return res.status(401).json({ message: 'Token ausente' });
   }
 
-  if (userKey !== ADMIN_KEY) {
-    return res.status(HttpStatus.UNAUTHORIZED).json({
-      status: 'error',
-      message: 'Acesso negado: Chave de administrador inválida ou ausente.'
-    });
+  try {
+    const secret = process.env.JWT_SECRET || 'fallback-secret';
+    const decoded = jwt.verify(token, secret);
+    (req as any).user = decoded; // Salva os dados do usuário na requisição
+    next();
+  } catch (err) {
+    return res.status(403).json({ message: 'Token inválido ou expirado' });
   }
-
-  // Se a chave estiver correta, permite prosseguir
-  next();
 };

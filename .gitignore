@@ -1,12 +1,13 @@
 # Dependências
 node_modules/
+dist/
 
 # Variáveis de ambiente (SEGURANÇA!)
 .env
 
 # Banco de dados SQLite local
-dev.db
-dev.db-journal
+*.db
+*.db-journal
 
 # Logs
 logs/
@@ -23,3 +24,7 @@ build/
 # Arquivos do Sistema Operacional
 .DS_Store
 Thumbs.db
+
+# IDEs e Editores
+.vscode/
+.idea/

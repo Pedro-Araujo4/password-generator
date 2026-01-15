@@ -4,104 +4,83 @@ const options: swaggerJSDoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Password Generator API',
-      version: '1.0.0',
-      description: 'API profissional para geração e gerenciamento de senhas seguras',
+      title: 'Password Safe API',
+      version: '1.1.0',
+      description: 'API para geração de senhas com cofre protegido por JWT',
+    },
+    components: {
+      securitySchemes: {
+        BearerAuth: { // Agora usamos JWT
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Insira o token recebido no /auth/login'
+        }
+      }
     },
     paths: {
-  '/api/generate': {
-    post: {
-      summary: 'Gera uma nova senha segura',
-      tags: ['Password'],
-      parameters: [
-        {
-          name: 'length',
-          in: 'query',
-          description: 'Comprimento da senha',
-          required: false,
-          schema: {
-            type: 'integer',
-            default: 12,
-            minimum: 4
-          }
-        },
-        {
-          name: 'hasSymbols',
-          in: 'query',
-          description: 'Incluir símbolos na senha?',
-          required: false,
-          schema: {
-            type: 'boolean',
-            default: true
-          }
-        },
-        {
-          name: 'noDuplication',
-          in: 'query',
-          description: 'Evitar caracteres duplicados?',
-          required: false,
-          schema: {
-            type: 'boolean',
-            default: false
-          }
+      // --- ROTAS DE AUTENTICAÇÃO ---
+      '/api/auth/signup': {
+        post: {
+          summary: 'Cria o usuário mestre',
+          tags: ['Auth'],
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { type: 'object', properties: { password: { type: 'string' } } } } }
+          },
+          responses: { 200: { description: 'Usuário criado' } }
         }
-      ],
-      responses: {
-        200: {
-          description: 'Sucesso',
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  password: { type: 'string' }
-                 }
-               }
-              }
-            }
-          }
+      },
+      '/api/auth/login': {
+        post: {
+          summary: 'Realiza login e retorna o Token',
+          tags: ['Auth'],
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { type: 'object', properties: { password: { type: 'string' } } } } }
+          },
+          responses: { 200: { description: 'Token gerado com sucesso' } }
         }
-       }
+      },
+      // --- ROTAS DE SENHA ---
+      '/api/generate': {
+        post: {
+          summary: 'Gera uma nova senha (Requer Login)',
+          tags: ['Password'],
+          security: [{ BearerAuth: [] }],
+          parameters: [
+            { name: 'length', in: 'query', schema: { type: 'integer', default: 12 } },
+            { name: 'hasSymbols', in: 'query', schema: { type: 'boolean', default: true } },
+            { name: 'noDuplicates', in: 'query', schema: { type: 'boolean', default: true } },
+          ],
+          responses: { 200: { description: 'Senha gerada' } }
+        }
       },
       '/api/passwords': {
         get: {
-          summary: 'Lista todas as senhas gravadas',
+          summary: 'Lista todas as senhas (Requer Login)',
           tags: ['Management'],
-          responses: {
-            200: { description: 'Lista de senhas retornada com sucesso' }
-          }
+          security: [{ BearerAuth: [] }],
+          responses: { 200: { description: 'Lista retornada' } }
         },
         delete: {
-          summary: 'Deleta todas as senhas (Requer Admin Key)',
+          summary: 'Remove TODAS as senhas do banco (Requer Login)',
           tags: ['Management'],
-          security: [{ AdminAuth: [] }],
+          security: [{ BearerAuth: [] }], // Proteção JWT
           responses: {
-            200: { description: 'Todas as senhas foram removidas' }
+            200: {
+              description: 'Sucesso',
+              content: { 'application/json': { schema: { type: 'object', properties: { message: { type: 'string' } } } } }
+            },
+            401: { description: 'Não autorizado' }
+            }
           }
-        }
       },
       '/api/passwords/{id}': {
-        get: {
-          summary: 'Busca os detalhes de uma senha específica',
-          tags: ['Management'],
-          parameters: [
-            {
-              in: 'path',
-              name: 'id',
-              required: true,
-              schema: { type: 'string' },
-              description: 'ID único da senha'
-            }
-          ],
-          responses: {
-            200: { description: 'Senha encontrada' },
-            404: { description: 'Senha não encontrada' }
-          }
-        },
         delete: {
-          summary: 'Remove uma senha específica (Requer Admin Key)',
+          summary: 'Remove uma senha específica por ID (Requer Login)',
           tags: ['Management'],
-          security: [{ AdminAuth: [] }],
+          security: [{ BearerAuth: [] }], // Proteção JWT
           parameters: [
             {
               in: 'path',
@@ -113,23 +92,14 @@ const options: swaggerJSDoc.Options = {
           ],
           responses: {
             200: { description: 'Senha removida com sucesso' },
-            401: { description: 'Chave inválida' },
-            404: { description: 'Senha não encontrada' }
+            401: { description: 'Não autorizado' },
+            404: { description: 'ID não encontrado' }
           }
         }
-      }
-    }, // Fim do paths
-    components: {
-      securitySchemes: {
-        AdminAuth: {
-          type: 'apiKey',
-          in: 'header',
-          name: 'x-admin-key'
-        }
-      }
+      },
     }
   },
-  apis: [], // Deixamos vazio para evitar os erros de indentação nos arquivos de rota
+  apis: [],
 };
 
 export const swaggerSpec = swaggerJSDoc(options);

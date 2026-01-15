@@ -4,6 +4,6 @@ export const parsePasswordQuery = (query: any): IPasswordOptions => {
   return {
     length: Number(query.length) || 12,
     hasSymbols: String(query.hasSymbols) === 'true', // transforma em string para evitar receber valores undefined ou null, além de que 
-    noDuplicates: String(query.noDuplicates) === 'true' //ao colocar essa regra, você é obrigado a responder ?symbols=true no query para deixar a variável true
+    noDuplicates: String(query.noDuplicates) === 'true', //ao colocar essa regra, você é obrigado a responder ?symbols=true no query para deixar a variável true
   };
 };
